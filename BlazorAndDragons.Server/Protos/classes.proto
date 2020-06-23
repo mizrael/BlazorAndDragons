@@ -1,0 +1,35 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option csharp_namespace = "BlazorAndDragons.Server";
+
+package classes;
+
+service Classes {
+  rpc GetAll (google.protobuf.Empty) returns (GetAllResponse);
+  rpc GetDetails(GetDetailsRequest) returns (GetDetailsResponse);
+}
+
+message GetAllResponse {
+    message ClassArchiveItem{
+     string id = 1;
+     string name = 2;
+	} 
+
+    repeated ClassArchiveItem data = 1;
+}
+
+message GetDetailsRequest{
+    string id = 1;
+}
+
+message GetDetailsResponse{
+    string id=1;
+    string name=2;
+    int32 hitDie=3;
+    repeated Proficiency proficiencies=4;
+
+    message Proficiency{
+	    string name=1;
+	}
+}
+

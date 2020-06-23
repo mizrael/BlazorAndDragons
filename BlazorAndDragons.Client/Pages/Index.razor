@@ -1,0 +1,45 @@
+﻿@page "/"
+@using Google.Protobuf.WellKnownTypes
+@using Grpc.Net.Client
+@using Grpc.Net.Client.Web
+
+<h1>Classes</h1>
+
+@if (_classes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in _classes)
+            {
+                <tr>
+                    <td><a href="/class/@item.Id">@item.Name</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private GetAllResponse.Types.ClassArchiveItem[] _classes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions
+        {
+            HttpHandler = new GrpcWebHandler(new HttpClientHandler())
+        });
+
+        var client = new Client.Classes.ClassesClient(channel);
+        var results = await client.GetAllAsync(new Empty());
+        this._classes = results?.Data?.ToArray();
+    }
+}

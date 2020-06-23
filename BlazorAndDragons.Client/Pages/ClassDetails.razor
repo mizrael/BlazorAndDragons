@@ -1,0 +1,57 @@
+@page "/class/{id}"
+@using Grpc.Net.Client
+@using Grpc.Net.Client.Web
+
+@if (null == _classDetails)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h1>Class: @_classDetails.Name</h1>
+    <p>Hit Die: d@_classDetails.HitDie</p>
+    @if (null != _classDetails.Proficiencies)
+    {
+        <h3>Proficiencies</h3>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in _classDetails.Proficiencies)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}
+
+<a href="/">Back to archive</a>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private GetDetailsResponse _classDetails;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions
+        {
+            HttpHandler = new GrpcWebHandler(new HttpClientHandler())
+        });
+
+        var client = new Client.Classes.ClassesClient(channel);
+        var request = new GetDetailsRequest()
+        {
+            Id = this.Id
+        };
+        _classDetails = await client.GetDetailsAsync(request);
+    }
+}
