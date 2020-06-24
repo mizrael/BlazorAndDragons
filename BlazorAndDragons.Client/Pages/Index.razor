@@ -1,7 +1,6 @@
 ﻿@page "/"
 @using Google.Protobuf.WellKnownTypes
-@using Grpc.Net.Client
-@using Grpc.Net.Client.Web
+@inject Classes.ClassesClient Client
 
 <h1>Classes</h1>
 
@@ -33,13 +32,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        using var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions
-        {
-            HttpHandler = new GrpcWebHandler(new HttpClientHandler())
-        });
-
-        var client = new Client.Classes.ClassesClient(channel);
-        var results = await client.GetAllAsync(new Empty());
+        var results = await this.Client.GetAllAsync(new Empty());
         this._classes = results?.Data?.ToArray();
     }
 }

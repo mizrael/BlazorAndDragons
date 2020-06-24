@@ -1,6 +1,5 @@
 @page "/class/{id}"
-@using Grpc.Net.Client
-@using Grpc.Net.Client.Web
+@inject Classes.ClassesClient Client
 
 @if (null == _classDetails)
 {
@@ -16,17 +15,17 @@ else
 
         <table class="table">
             <thead>
-            <tr>
-                <th>Name</th>
-            </tr>
+                <tr>
+                    <th>Name</th>
+                </tr>
             </thead>
             <tbody>
-            @foreach (var item in _classDetails.Proficiencies)
-            {
-                <tr>
-                    <td>@item.Name</td>
-                </tr>
-            }
+                @foreach (var item in _classDetails.Proficiencies)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                    </tr>
+                }
             </tbody>
         </table>
     }
@@ -42,16 +41,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        using var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions
-        {
-            HttpHandler = new GrpcWebHandler(new HttpClientHandler())
-        });
-
-        var client = new Client.Classes.ClassesClient(channel);
         var request = new GetDetailsRequest()
         {
             Id = this.Id
         };
-        _classDetails = await client.GetDetailsAsync(request);
+        _classDetails = await this.Client.GetDetailsAsync(request);
     }
 }
